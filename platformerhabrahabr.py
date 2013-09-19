@@ -6,6 +6,7 @@ import pygame
 from pygame import *
 from player import *
 from blocks import *
+from shot import *
 
 #Объявляем переменные
 WIN_WIDTH = 800 #Ширина создаваемого окна
@@ -36,6 +37,10 @@ def camera_configure(camera, target_rect):
 
     return Rect(l, t, w, h)        
 
+def load_image(file):
+    surface = pygame.image.load(file)
+    return surface.convert()
+
 
 def main():
     pygame.init() # Инициация PyGame, обязательная строчка 
@@ -48,8 +53,13 @@ def main():
     hero = Player(55,55) # создаем героя по (x,y) координатам
     left = right = False # по умолчанию - стоим
     up = False
+
+    img = load_image('explosion1.gif')
+    Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
+
     
     entities = pygame.sprite.Group() # Все объекты
+    shots = pygame.sprite.Group() # Выстрелы
     platforms = [] # то, во что мы будем врезаться или опираться
     
     entities.add(hero)
@@ -102,7 +112,7 @@ def main():
         timer.tick(60)
         for e in pygame.event.get(): # Обрабатываем события
             if e.type == QUIT:
-                raise SystemExit, "QUIT"
+                raise SystemExit#, "QUIT"
             if e.type == KEYDOWN and e.key == K_UP:
                 up = True
             if e.type == KEYDOWN and e.key == K_LEFT:
@@ -118,11 +128,25 @@ def main():
             if e.type == KEYUP and e.key == K_LEFT:
                 left = False
 
+        keystate = pygame.key.get_pressed()
+        firing = keystate[K_SPACE]
+        direction = 0
+        if (left or right) and left:
+            direction = -1
+        else:
+            direction = 1
+        if firing and direction != 0:
+            shot = Shot(hero.gunpos(direction), direction)
+            entities.add(shot)
+            shots.add(shot)
+
         screen.blit(bg, (0,0))      # Каждую итерацию необходимо всё перерисовывать 
 
 
         camera.update(hero) # центризируем камеру относительно персонажа
         hero.update(left, right, up,platforms) # передвижение
+        for s in shots:
+            s.update(platforms)
         #entities.draw(screen) # отображение
         for e in entities:
             screen.blit(e.image, camera.apply(e))

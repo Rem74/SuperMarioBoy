@@ -30,6 +30,7 @@ ANIMATION_JUMP = [('%s/mario/j.png' % ICON_DIR, 0.1)]
 ANIMATION_STAY = [('%s/mario/0.png' % ICON_DIR, 0.1)]
 
 class Player(sprite.Sprite):
+    gun_offset = 5
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
         self.xvel = 0   #скорость перемещения. 0 - стоять на месте
@@ -128,3 +129,6 @@ class Player(sprite.Sprite):
                     self.rect.top = p.rect.bottom # то не движется вверх
                     self.yvel = 0                 # и энергия прыжка пропадает
        
+    def gunpos(self, direction):
+        pos = self.gun_offset*direction + self.rect.centerx
+        return pos, self.rect.centery
