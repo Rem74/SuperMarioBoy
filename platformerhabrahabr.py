@@ -54,7 +54,7 @@ def main():
     left = right = False # по умолчанию - стоим
     up = False
 
-    img = load_image('explosion1.gif')
+    img = load_image('explosions/explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
 
     
